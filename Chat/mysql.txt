@@ -1,0 +1,10 @@
+create table registeredUser (
+	name varchar(16) primary key, # id
+	password varchar(16)
+);
+create table onlineUser(
+	name varchar(16) primary key, #id
+	ip varchar(30), #ip
+	port int(10), #¶Ë¿Ú
+	status varchar(20) #×´Ì¬
+);
