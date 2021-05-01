@@ -8,8 +8,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class ServerSender extends Thread {
-    private String receiverAddress;
-    private Message msg;
+    private final String receiverAddress;
+    private final Message msg;
 
     public ServerSender(String receiverAddress, Message msg) {
         this.receiverAddress = receiverAddress;

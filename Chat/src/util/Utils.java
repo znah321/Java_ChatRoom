@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.ResourceBundle;
 
 public class Utils {
-    private static ResourceBundle resourceBundle = ResourceBundle.getBundle("config");
+    private static final ResourceBundle resourceBundle = ResourceBundle.getBundle("config");
     private Utils() {
     }
 
@@ -29,26 +29,6 @@ public class Utils {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * 清空文件内容
-     *
-     * @param path 文件路径
-     */
-    public static void cleanFileContents(String path) {
-        File file = new File(path);
-        try {
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-            FileWriter fileWriter = new FileWriter(file);
-            fileWriter.write("");
-            fileWriter.flush();
-            fileWriter.close();
-        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -65,6 +45,7 @@ public class Utils {
         testDialog.setBounds(400, 200, 240, 150);
         testDialog.setLayout(new FlowLayout());
         JButton testButton = new JButton("确定");
+        testButton.setFont(new Font("Microsoft Yahei", Font.PLAIN, 20));
         testButton.addActionListener(e -> {
             testDialog.setVisible(false);
             backF.setVisible(true);
@@ -85,7 +66,9 @@ public class Utils {
                 backF.setVisible(true);
             }
         });
-        testDialog.add(new JLabel(msg));
+        JLabel label = new JLabel(msg);
+        label.setFont(new Font("Microsoft Yahei", Font.PLAIN, 20));
+        testDialog.add(label);
         testDialog.add(new JLabel("                            "));
         testDialog.add(testButton);
         testDialog.setVisible(true);
@@ -143,62 +126,6 @@ public class Utils {
     }
 
     /**
-     * 根据字节数据编译信息
-     * @param bytes 字节数组
-     * @return Message类的信息
-     */
-    public static Message parseMessage(byte[] bytes) {
-        Message msg = new Message();
-        Message.MsgType msgType = null;
-        Message.SendType sendType = null;
-        int flagPos = 0;
-        String rawMsg = new String(bytes);
-
-        flagPos = rawMsg.indexOf("@");
-        if (rawMsg.substring(0, flagPos).equals("WORD")) {
-            msgType = Message.MsgType.WORD;
-        } else if (rawMsg.substring(0, flagPos).equals("AUDIO")) {
-            msgType = Message.MsgType.AUDIO;
-        } else {
-            msgType = Message.MsgType.FILE;
-        }
-        rawMsg = rawMsg.substring(flagPos+1);
-        flagPos = 0;
-        msg.setMsgType(msgType);
-
-        flagPos = rawMsg.indexOf("@");
-        if (rawMsg.substring(0, flagPos).equals("ONLINE")) {
-            sendType = Message.SendType.ONLINE;
-        } else if (rawMsg.substring(0, flagPos).equals("ALL")) {
-            sendType = Message.SendType.ALL;
-        } else if (rawMsg.substring(0, flagPos).equals("TELL")){
-            sendType = Message.SendType.TELL;
-        } else {
-            sendType = Message.SendType.LEAVE;
-        }
-        rawMsg = rawMsg.substring(flagPos+1);
-        flagPos = 0;
-        msg.setSendType(sendType);
-
-        flagPos = rawMsg.indexOf("@");
-        String sendAdr = rawMsg.substring(0, flagPos);
-        rawMsg = rawMsg.substring(flagPos+1);
-        msg.setSendAdr(sendAdr);
-        flagPos = 0;
-
-        flagPos = rawMsg.indexOf("@");
-        String recAdr = rawMsg.substring(0, flagPos);
-        rawMsg = rawMsg.substring(flagPos+1);
-        msg.setRecAdr(recAdr);
-        flagPos = 0;
-
-        String content = rawMsg;
-        msg.setContent(content);
-
-        return msg;
-    }
-
-    /**
      * 获取当前时间
      * @return 当前时间（年-月-日 时：分：秒）
      */
@@ -207,5 +134,62 @@ public class Utils {
         java.util.Date d= new Date();
         String time = sdf.format(d);
         return time;
+    }
+
+    /**
+     * 建立系统目录
+     * @param username 用户名
+     */
+    public static void createSystemDirectory(String username) {
+        String path = System.getenv("USERPROFILE") + "\\Java_ChatRoom\\" + username;
+        File file = new File(path);
+        if (!file.exists() || file.isFile()) {
+            file.mkdirs();
+        }
+
+        File recvFile = new File(path + "\\FileRecv");
+        if (!recvFile.exists() || recvFile.isFile()) {
+            recvFile.mkdirs();
+        }
+
+        File audioFile = new File(path + "\\AudioRecv");
+        if (!audioFile.exists() || audioFile.isFile()) {
+            audioFile.mkdirs();
+        }
+    }
+
+    /**
+     * 获取用户地址
+     * @param username 用户名
+     * @param type 种类
+     * @return 地址
+     */
+    public static String getFilePath(String username, String type) {
+        String path = System.getenv("USERPROFILE") + "\\Java_ChatRoom\\" + username;
+        if (type.equals("FILE")) {
+            path = path + "\\FileRecv";
+        } else {
+            path = path + "\\AudioRecv";
+        }
+        return path;
+    }
+
+    /**
+     * 删除文件
+     * @param filepath 文件路径
+     */
+    public static void deleteFile(String filepath) {
+        File file = new File(filepath);
+        file.delete();
+    }
+
+    /**
+     * 判断文件是否存在
+     * @param filepath 文件路径
+     * @return true为存在，false为不存在
+     */
+    public static boolean fileExists(String filepath) {
+        File file = new File(filepath);
+        return file.exists() && file.isFile();
     }
 }

@@ -13,14 +13,13 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class Client {
     /*
         客户类
      */
     public String name;
+    public RoomUI roomUI;
     public Socket socket = null;
     public Server.Status serverStatus;
     public ObjectOutputStream oos;
@@ -31,8 +30,15 @@ public class Client {
         LoginUI loginUI = new LoginUI();
         loginUI.run();
         InetAddress localhost = null;
+        InetAddress serverHost = null;
         try {
             localhost = InetAddress.getLocalHost();
+            // 判断服务器和客户端是否运行在同一台计算机上
+            if (Utils.isPortUsing(Integer.parseInt(Utils.getConfig("SERVER_PORT")))) {
+                serverHost = localhost;
+            } else {
+                serverHost = InetAddress.getByName(Utils.getConfig("SERVER_IP"));
+            }
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
@@ -46,6 +52,7 @@ public class Client {
         } else {
             // 登录成功
             RoomUI roomUI = new RoomUI(client);
+            client.roomUI = roomUI;
             roomUI.initUI();
             /*
                 1、建立Socket连接服务器
@@ -53,9 +60,10 @@ public class Client {
                 3、主线程接收消息输入框里的消息
              */
             try {
-                client.socket = new Socket(localhost, SERVER_PORT, localhost, Utils.allocatePort());
+                client.socket = new Socket(serverHost, SERVER_PORT, localhost, Utils.allocatePort());
                 client.serverStatus = Server.Status.RUNNING;
                 client.name = loginUI.accText.getText();
+                Utils.createSystemDirectory(client.name);
                 MySQLUtils.login(client.name, client.socket.getLocalSocketAddress().toString(), client.socket.getLocalPort());
                 // 初始化sendType组件和onlineCnt组件
                 ResultSet set = MySQLUtils.getAllOnlineUser();
@@ -151,7 +159,7 @@ public class Client {
         } else {
             text = text + "悄悄地对" + MySQLUtils.getNameByIP(recAddr);
         }
-        String fullContent = text + " " + Utils.getCurrentTime() + "\n" + content + "\n\n";
-        roomUI.getChatHistory().append(fullContent);
+        String fullContent = text + " " + Utils.getCurrentTime() + "<br>" + content + "<br><br>";
+        roomUI.appendText(name, fullContent, msg);
     }
 }

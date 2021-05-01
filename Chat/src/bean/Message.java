@@ -6,13 +6,13 @@ public class Message implements Serializable {
     /*
         信息类
      */
-    private static final long serialVersionUID = 2196110968332072987L;
-    private MsgType msgType;
-    private SendType sendType;
-    private String sendAdr; // 发送人地址
-    private String recAdr; // 收件人地址
-    private String content; // 消息内容
-    private String fullMessage;
+    protected static final long serialVersionUID = 2196110968332072987L;
+    protected MsgType msgType;
+    protected SendType sendType;
+    protected String sendAdr; // 发送人地址
+    protected String recAdr; // 收件人地址
+    protected String content; // 消息内容
+    protected String fullMessage;
 
     public enum MsgType { // 消息类型
         WORD,
@@ -39,8 +39,8 @@ public class Message implements Serializable {
         this.sendAdr = sendAdr;
         this.recAdr = recAdr;
         this.content = content;
-        if (!this.content.endsWith("\n")) {
-            this.content = this.content + "\n";
+        if (!this.content.endsWith("<br>")) {
+            this.content = this.content + "<br>";
         }
         this.jointMessage();
     }
@@ -56,8 +56,8 @@ public class Message implements Serializable {
         if (msgType == MsgType.FILE) {
             this.content = "发送了一个文件";
         }
-        if (!this.content.endsWith("\n")) {
-            this.content = this.content + "\n";
+        if (!this.content.endsWith("<br>")) {
+            this.content = this.content + "<br>";
         }
         this.jointMessage();
     }

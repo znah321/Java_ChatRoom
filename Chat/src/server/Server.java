@@ -2,7 +2,6 @@ package server;
 
 import UI.ServerUI;
 import bean.Message;
-import util.MySQLUtils;
 import util.Utils;
 
 import java.io.*;
@@ -14,9 +13,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Server {
-    private static Map<String, Socket> onlineUserList = new HashMap<>(); // 用户列表
-    private static Map<String, ObjectOutputStream> oosUserMap = new HashMap<>(); // 用户对应的ObjectOutputStream的Map
-    private static ExecutorService clientPool = Executors.newFixedThreadPool(50); // 用户线程池
+    private static final Map<String, Socket> onlineUserList = new HashMap<>(); // 用户列表
+    private static final Map<String, ObjectOutputStream> oosUserMap = new HashMap<>(); // 用户对应的ObjectOutputStream的Map
+    private static final ExecutorService clientPool = Executors.newFixedThreadPool(50); // 用户线程池
     public enum Status {
         UNSTART,
         RUNNING,
@@ -29,14 +28,14 @@ public class Server {
 
         final int SERVER_PORT = Integer.parseInt(Utils.getConfig("SERVER_PORT"));
         final int STOP_PORT = Integer.parseInt(Utils.getConfig("STOP_PORT"));
-        ServerUI.getHistory().append("Server started...\n");
+        ServerUI.appendText("Server started...\n");
 
         try (ServerSocket serverSocket = new ServerSocket(SERVER_PORT)) {
             while (true) {
                 // 等待新的连接
                 Socket clientSocket = serverSocket.accept();
                 String connectionMsg = "[New Connection] Connected from " + clientSocket.getRemoteSocketAddress() + "\n";
-                ServerUI.getHistory().append(connectionMsg);
+                ServerUI.appendText(connectionMsg);
 
                 // 检查是否为STOP_PORT
                 if (clientSocket.getPort() == (STOP_PORT)) {

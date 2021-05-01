@@ -5,13 +5,14 @@ import bean.Message;
 import util.MySQLUtils;
 import util.Utils;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.util.Iterator;
-import java.util.Map;
 
 public class ServerReceiver extends Thread {
-    private Socket socket;
+    private final Socket socket;
 
     public ServerReceiver(Socket socket) {
         this.socket = socket;
@@ -25,17 +26,8 @@ public class ServerReceiver extends Thread {
             input = socket.getInputStream(); // 获取输入流
             ois = new ObjectInputStream(input);
             while (true) {
-                /*
-                    for循环阻塞，有数据则input.available() > 0
-                 */
-                /*
-                for(;;) {
-                    if (input.available() > 0)
-                        break;
-                }
-                 */
                 Message message = (Message) ois.readObject();
-                ServerUI.getHistory().append(message.getContent());
+                ServerUI.appendText(message.getContent());
 
                 if (message.getSendType() == Message.SendType.ONLINE) {
                     this.sendOnlineNotice(message);

@@ -5,8 +5,8 @@ import bean.Message;
 import java.io.*;
 
 public class ClientSender extends Thread {
-    private ObjectOutputStream oos;
-    private Message msg;
+    private final ObjectOutputStream oos;
+    private final Message msg;
 
     public ClientSender(ObjectOutputStream oos, Message msg) {
         this.oos = oos;

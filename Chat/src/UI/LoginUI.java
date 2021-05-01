@@ -9,50 +9,39 @@ import java.awt.event.*;
 import java.util.Enumeration;
 
 public class LoginUI {
-    public JFrame f;;
+    public JFrame f;
     public JButton loginBut; // 登录按钮
     public JButton registerBut; // 注册按钮
     public JLabel accLab; // 帐号标签
     public JTextField accText; // 帐号文本框
     public JLabel passwordLab; // 密码标签
     public JPasswordField passwordText; // 密码文本框
-    public JLabel serverState; // 服务器状态
     public String state = null;
+    public static Font font = new Font("Microsoft Yahei", Font.PLAIN, 20);
 
     public void run() {
-        this.initGlobalFonts();
         this.initComponents();
         this.registerListener();
-    }
-
-    /**
-     * 界面统一设置字体样式
-     */
-    public void initGlobalFonts() {
-        Font font = new Font("Microsoft Yahei", Font.PLAIN, 20);
-        FontUIResource fontRes = new FontUIResource(font);
-
-        for(Enumeration<Object> keys = UIManager.getDefaults().keys(); keys.hasMoreElements();) {
-            Object key = keys.nextElement();
-            Object value = UIManager.get(key);
-            if (value instanceof FontUIResource) {
-                UIManager.put(key, fontRes);
-            }
-        }
     }
 
     /**
      * 初始化组件
      */
     public void initComponents() {
-        this.f  = new JFrame("JChat");;
+        this.f  = new JFrame("JChat");
+        f.setFont(font);
         this.loginBut = new JButton("    登录    "); // 登录按钮
+        loginBut.setFont(font);
         this.registerBut = new JButton("    注册    "); // 注册按钮
+        registerBut.setFont(font);
         this.accLab = new JLabel("账号："); // 帐号标签
+        accLab.setFont(font);
         this.accText = new JTextField(8); // 帐号文本框
+        accText.setFont(font);
         this.passwordLab = new JLabel("密码："); // 密码标签
+        passwordLab.setFont(font);
         this.passwordText = new JPasswordField(8); // 密码文本框
-        this.serverState = new JLabel(); // 服务器状态
+        passwordText.setFont(font);
 
         this.f.setBounds(400, 300, 400, 500);
         this.f.setLayout(new FlowLayout());
@@ -87,11 +76,6 @@ public class LoginUI {
 
         this.f.add(new JLabel("                                                       "));
         this.f.add(new JLabel("                                                       "));
-
-        // 服务器状态
-        // test
-        this.serverState.setText("服务器当前状态：未启动");
-        this.f.add(this.serverState);
 
         this.f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.f.setVisible(true);

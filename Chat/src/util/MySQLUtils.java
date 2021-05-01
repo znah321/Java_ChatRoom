@@ -88,7 +88,6 @@ public class MySQLUtils {
     public static void login(String name, String ip, int port) {
         Connection conn = null;
         PreparedStatement ps = null;
-        ResultSet rs = null;
 
         try {
             conn = getConnection();
@@ -135,7 +134,6 @@ public class MySQLUtils {
     public static void register(String name, String password) {
         Connection conn = null;
         PreparedStatement ps = null;
-        ResultSet rs = null;
 
         try {
             conn = getConnection();
@@ -149,30 +147,9 @@ public class MySQLUtils {
         }
     }
 
-    /**
-     * 用户注销
-     * @param name 用户名
-     */
-    public static void deleteClientByName(String name) {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        try {
-            conn = getConnection();
-            String sql = "delete from onlineUser where name = ?";
-            ps = conn.prepareStatement(sql);
-            ps.setString(1, name);
-            ps.executeUpdate();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-    }
-
     public static void deleteClientByIP(String ip) {
         Connection conn = null;
         PreparedStatement ps = null;
-        ResultSet rs = null;
 
         try {
             conn = getConnection();
@@ -229,24 +206,6 @@ public class MySQLUtils {
     }
 
     /**
-     * 注销所有用户
-     */
-    public static void deleteAllClient() {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        try {
-            conn = getConnection();
-            String sql = "delete from onlineUser";
-            ps = conn.prepareStatement(sql);
-            ps.executeUpdate();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-    }
-
-    /**
      * 根据名字更改用户状态
      * @param name 名字
      * @param status 状态
@@ -254,7 +213,6 @@ public class MySQLUtils {
     public static void changeStatusByName(String name, String status) {
         Connection conn = null;
         PreparedStatement ps = null;
-        ResultSet rs = null;
 
         try {
             conn = getConnection();
@@ -276,7 +234,6 @@ public class MySQLUtils {
     public static void changeStatusByIP(String ip, String status) {
         Connection conn = null;
         PreparedStatement ps = null;
-        ResultSet rs = null;
 
         try {
             conn = getConnection();
@@ -315,30 +272,6 @@ public class MySQLUtils {
     }
 
     /**
-     * 根据ip查询用户是否在线
-     * @param ip 名字
-     * @return 结果
-     */
-    public static boolean isOnlineByIP(String ip) {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        try {
-            conn = getConnection();
-            String sql = "select * from onlineUser where ip = ?";
-            ps = conn.prepareStatement(sql);
-            ps.setString(1, ip);
-            rs = ps.executeQuery();
-            if (rs.next())
-                return true;
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-        return false;
-    }
-
-    /**
      * 根据名字获取用户状态
      * @param name 名字
      * @return
@@ -354,31 +287,6 @@ public class MySQLUtils {
             String sql = "select * from onlineUser where name = ?";
             ps = conn.prepareStatement(sql);
             ps.setString(1, name);
-            rs = ps.executeQuery();
-            if (rs.next())
-                status = rs.getString("status");
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-        return status;
-    }
-
-    /**
-     * 根据ip获取用户状态
-     * @param ip IP地址
-     * @return
-     */
-    public static String getStatusByIP(String ip) {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        String status = null;
-
-        try {
-            conn = getConnection();
-            String sql = "select * from onlineUser where ip = ?";
-            ps = conn.prepareStatement(sql);
-            ps.setString(1, ip);
             rs = ps.executeQuery();
             if (rs.next())
                 status = rs.getString("status");

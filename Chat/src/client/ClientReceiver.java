@@ -1,8 +1,11 @@
 package client;
 
 import UI.RoomUI;
+import bean.Audio;
+import bean.FileBean;
 import bean.Message;
 import server.Server;
+import util.AudioUtils;
 import util.MySQLUtils;
 import util.Utils;
 
@@ -18,8 +21,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ClientReceiver extends Thread {
-    private Client client;
-    private RoomUI roomUI;
+    private final Client client;
+    private final RoomUI roomUI;
 
     public ClientReceiver(Client client, RoomUI roomUI) {
         this.client = client;
@@ -29,12 +32,30 @@ public class ClientReceiver extends Thread {
     @Override
     public void run() {
         Socket socket = client.socket;
-        System.out.println(socket.getLocalSocketAddress() + " receiver started...");
         try {
             InputStream input = socket.getInputStream();
             ObjectInputStream ois = new ObjectInputStream(input);
             while (true) {
                 Message msg = (Message) ois.readObject();
+                // 播放提示音
+                if (msg.getSendType() == Message.SendType.ONLINE) {
+                    if (msg.getContent().endsWith("进入了聊天室<br>")) {
+                        AudioUtils.playOnlineAudio();
+                    }
+                } else {
+                    AudioUtils.playNewMessageAudio();
+                }
+                // 处理消息
+                if (msg.getMsgType() == Message.MsgType.FILE) {
+                    FileBean fileBean = (FileBean) msg;
+                    fileBean.bytesToFile();
+                }
+                if (msg.getMsgType() == Message.MsgType.AUDIO) {
+                    Audio audio = (Audio) msg;
+                    String newPath = Utils.getFilePath(this.client.name, "AUDIO") + "\\" + audio.getFile().getName();
+                    audio.setAudioName(newPath);
+                    audio.bytesToAudio();
+                }
                 /*
                     服务器被管理员关闭
                  */
@@ -54,9 +75,9 @@ public class ClientReceiver extends Thread {
             }
         } catch (IOException e) {
             // 从客户端一端退出，会抛出EOFException
-            if (e.getClass().equals(EOFException.class)) {
+            if (e instanceof EOFException) {
                 // do nothing
-            } else if (e.getClass().equals(SocketException.class)){
+            } else if (e instanceof SocketException){
                 // do nothing
             } else {
                 e.printStackTrace();
@@ -64,7 +85,6 @@ public class ClientReceiver extends Thread {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        System.out.println(socket.getLocalSocketAddress() + " receiver ended...");
     }
 
     /**
@@ -84,8 +104,8 @@ public class ClientReceiver extends Thread {
                 sender = sender + "对所有人说";
             }
         }
-        String fullMsg = sender + " " + time + "\n" + msg.getContent() + "\n";
-        this.roomUI.getChatHistory().append(fullMsg);
+        String fullMsg = sender + " " + time + "<br>" + msg.getContent() + "<br>";
+        this.roomUI.appendText(sender, fullMsg, msg);
         /*
             收到被禁言消息：
                 启动一个SilentThread线程，传入一个时间戳和禁言时间，当时间达到时间戳+禁言时间时结束禁言
@@ -107,17 +127,16 @@ public class ClientReceiver extends Thread {
          */
         if (msg.getSendType() == Message.SendType.ONLINE || msg.getSendType() == Message.SendType.LEAVE) {
             String content = msg.getContent();
-            String suffix = content.substring(content.length() - 7);
             //如果收到的是某用户的上线通知，需要在UI的sendType、onlineCnt控件更新
-            if (msg.getSendType() == Message.SendType.ONLINE && suffix.equals("进入了聊天室\n")) {
-                String name = content.substring(0, content.length() - 7);
+            if (msg.getSendType() == Message.SendType.ONLINE && content.contains("进入了聊天室<br>")) {
+                String name = content.substring(0, content.length() - 10);
                 this.roomUI.getSendType().addItem(name);
                 // onlineCnt控件
                 this.roomUI.getOnlineCnt().append(name + "\n");
             }
             //如果收到的是某用户的下线通知，同理
-            if (msg.getSendType() == Message.SendType.LEAVE && suffix.equals("退出了聊天室\n")) {
-                String name = content.substring(0, content.length() - 7);
+            if (msg.getSendType() == Message.SendType.LEAVE && content.contains("退出了聊天室<br>")) {
+                String name = content.substring(0, content.length() - 10);
                 roomUI.getSendType().removeItem(name);
                 // onlineCnt控件
                 String text = this.roomUI.getOnlineCnt().getText();

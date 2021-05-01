@@ -15,7 +15,7 @@ public class RegisterUI {
     /*
         注册窗口
      */
-    private LoginUI loginUI;
+    private final LoginUI loginUI;
     private JFrame f;
     private JLabel nameLab; // 用户名标签
     private JLabel pwLab; // 密码标签
@@ -43,12 +43,19 @@ public class RegisterUI {
     public void initComponents() {
         this.f = new JFrame("注册用户");
         this.nameLab = new JLabel("    用户名："); // 用户名标签
+        this.nameLab.setFont(new Font("Microsoft Yahei", Font.PLAIN, 20));
         this.pwLab = new JLabel("       密码："); // 密码标签
+        this.pwLab.setFont(new Font("Microsoft Yahei", Font.PLAIN, 20));
         this.confPwLab = new JLabel("确认密码："); // 确认密码标签
+        this.confPwLab.setFont(new Font("Microsoft Yahei", Font.PLAIN, 20));
         this.nameText = new JTextField(12); // 用户文本框
+        this.nameLab.setFont(new Font("Microsoft Yahei", Font.PLAIN, 20));
         this.pwText = new JPasswordField(12); // 密码文本框
+        this.pwText.setFont(new Font("Microsoft Yahei", Font.PLAIN, 20));
         this.confPwText = new JPasswordField(12); // 确认密码文本框
+        this.confPwText.setFont(new Font("Microsoft Yahei", Font.PLAIN, 20));
         this.registerBut = new JButton("    注册    "); // 注册按钮
+        this.registerBut.setFont(new Font("Microsoft Yahei", Font.PLAIN, 20));
 
         this.f.setBounds(400, 300, 400, 500);
         this.f.setLayout(new FlowLayout());
